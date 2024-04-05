@@ -28,14 +28,8 @@ pos_colors = {
 
 def visualize_entities(text, entity_types):
     
-    doc = nlp(text)
-    
-    print(entity_types)
-    
-    if not entity_types:
-        output = displacy.render([doc], style="ent")
-        st.write(output, unsafe_allow_html=True)
-    elif entity_types == ["ALL"]:
+    doc = nlp(text)    
+    if not entity_types or entity_types == ["ALL"]:
         output = displacy.render([doc], style="ent")
         st.write(output, unsafe_allow_html=True)
     else:
@@ -56,7 +50,7 @@ def pos_tagging(text, pos_tags):
         for token in doc:
             # Get the color for the POS tag, default to white if not found
             color = pos_colors.get(token.pos_, "#FFFFFF")
-            html += f"<span style='background-color: {color}; color: white; padding: 2px; margin: 3px; border-radius: 0.3em;'>{token.text} </span>"
+            html += f"<a href='https://www.google.com/search?q={token.text}' style='text-decoration: none;'><span style='background-color: {color}; text-decoration: none; color: white; padding: 2px; margin: 3px; border-radius: 0.3em;'>{token.text} </span></a>"
         html += "</div>"
     else:
         # Generate HTML markup to highlight each word with its POS tag using colors
@@ -65,7 +59,7 @@ def pos_tagging(text, pos_tags):
             if token.pos_ in pos_tags:
             # Get the color for the POS tag, default to white if not found
                 color = pos_colors.get(token.pos_, "#FFFFFF")
-                html += f"<span style='background-color: {color}; color: white; padding: 2px; margin: 3px; border-radius: 0.3em;'>{token.text} </span>"
+                html += f"<a href='https://www.google.com/search?q={token.text}' style='text-decoration: none;'><span style='background-color: {color};  color: white; padding: 2px; margin: 3px; border-radius: 0.3em;'>{token.text} </span></a>"
             else:
                 html += f"<span>{token.text} </span>"
         html += "</div>"

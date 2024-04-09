@@ -1,11 +1,19 @@
-import streamlit as st
-import wikipedia
 import spacy
 from spacy import displacy
 
-nlp = spacy.load("en_core_web_sm")
+import streamlit as st
+from streamlit_option_menu import option_menu
+from PIL import Image
 
-pos_colors = {
+import pytesseract
+import textwrap
+
+import wikipedia
+
+
+NLP = spacy.load("en_core_web_sm")
+
+POS_COLORS = {
         "ADJ": "#FF5733",  # Adjective
         "ADP": "#FFD700",  # Adposition
         "ADV": "#00FFFF",  # Adverb
@@ -23,82 +31,191 @@ pos_colors = {
         "SCONJ": "#000080",  # Subordinating conjunction
         "SYM": "#8B008B",  # Symbol
         "VERB": "#800080",  # Verb
-        "Other": "#708090"  # Other
+        "X": "#708090"  # Other
     }
 
-def visualize_entities(text, entity_types):
-    
-    doc = nlp(text)
-    
-    print(entity_types)
-    
-    if not entity_types:
-        output = displacy.render([doc], style="ent")
-        st.write(output, unsafe_allow_html=True)
-    elif entity_types == ["ALL"]:
-        output = displacy.render([doc], style="ent")
-        st.write(output, unsafe_allow_html=True)
-    else:
-        output = displacy.render([doc], style="ent", options = {"ents": entity_types})
-        st.write(output, unsafe_allow_html=True)
-    
-def pos_tagging(text, pos_tags):
+def visualize_entities(text):
+    if text:
+        doc = NLP(text)
+        entity_labels = {ent.label_ for ent in doc.ents}
+        entity_types = st.multiselect("Select Entity Type", ("ALL",) + tuple(entity_labels), ("ALL"))
+        if not entity_types or entity_types == ["ALL"]:
+            output = displacy.render([doc], style="ent")
+            st.write(output, unsafe_allow_html=True)
+        else:
+            output = displacy.render([doc], style="ent", options={"ents": entity_types})
+            st.write(output, unsafe_allow_html=True)
+
+def pos_tagging(text):
     # Load the English language model    
     # Process the text with SpaCy
-    doc = nlp(text)
-    
-    for pos, color in pos_colors.items():
-        st.sidebar.markdown(f'<div style="display:flex; align-items: center;"><div style="background-color:{color}; width:20px; height:20px; margin-right:10px; border-radius: 5px;"></div><div>{pos}</div></div>', unsafe_allow_html=True)
-    
-    if pos_tags[0] == "ALL":
-        # Generate HTML markup to highlight each word with its POS tag using colors
-        html = "<div>"
-        for token in doc:
-            # Get the color for the POS tag, default to white if not found
-            color = pos_colors.get(token.pos_, "#FFFFFF")
-            html += f"<span style='background-color: {color}; color: white; padding: 2px; margin: 3px; border-radius: 0.3em;'>{token.text} </span>"
-        html += "</div>"
-    else:
-        # Generate HTML markup to highlight each word with its POS tag using colors
-        html = "<div>"
-        for token in doc:
-            if token.pos_ in pos_tags:
-            # Get the color for the POS tag, default to white if not found
-                color = pos_colors.get(token.pos_, "#FFFFFF")
-                html += f"<span style='background-color: {color}; color: white; padding: 2px; margin: 3px; border-radius: 0.3em;'>{token.text} </span>"
-            else:
-                html += f"<span>{token.text} </span>"
-        html += "</div>"
-
-    st.write(html, unsafe_allow_html=True)
-
-#def dropdown(text):
-    
-def RadioButton(text, ner_types, pos_types):
     if text:
-        option = st.radio("Select Visualization", ("Entity Recognizer", "Part of Speech Tagging"),horizontal=True)
-        if option == "Entity Recognizer":
-            entity_type = st.multiselect("Select Entity Type", ("ALL",) + ner_types,("ALL"))
-            visualize_entities(text,entity_type)
-        else :
-            pos_tags = st.multiselect("Select Part of Speech Tags", ("ALL",) + pos_types,("ALL"))
-            pos_tagging(text, pos_tags)
-        
+        doc = NLP(text)
+        tag = {word.pos_ for word in doc}
+        pos_types = {word.pos_ for word in doc}
+        pos_tags = st.multiselect("Select Part of Speech Tags", ("ALL",) + tuple(pos_types),("ALL"))
+        for pos, color in POS_COLORS.items():
+            if pos in tag:
+                st.sidebar.markdown(f'<div style="display:flex; align-items: center;"><div style="background-color:{color}; width:20px; height:20px; margin-right:10px; border-radius: 5px;"></div><div>{pos}</div></div>', unsafe_allow_html=True)
+                
+        if pos_tags[0] == "ALL" or len(pos_tags) == 0:
+            # Generate HTML markup to highlight each word with its POS tag using colors
+            html = "<div>"
+            for token in doc:
+                # Get the color for the POS tag, default to white if not found
+                color = POS_COLORS.get(token.pos_, "#FFFFFF")
+                html += f"<a href='https://www.google.com/search?q={token.text}' style='text-decoration: none;'><span style='background-color: {color}; text-decoration: none; color: white; padding: 2px; margin: 3px; border-radius: 0.3em;'>{token.text} </span></a>"
+            html += "</div>"
+        else:
+            # Generate HTML markup to highlight each word with its POS tag using colors
+            html = "<div>"
+            for token in doc:
+                if token.pos_ in pos_tags:
+                # Get the color for the POS tag, default to white if not found
+                    color = POS_COLORS.get(token.pos_, "#FFFFFF")
+                    html += f"<a href='https://www.google.com/search?q={token.text}' style='text-decoration: none;'><span style='background-color: {color};  color: white; padding: 2px; margin: 3px; border-radius: 0.3em;'>{token.text} </span></a>"
+                else:
+                    html += f"<span>{token.text} </span>"
+            html += "</div>"
+
+        st.write(html, unsafe_allow_html=True)
+
+def extract_text_from_image(uploaded_file):
+
+    # Display uploaded image
+    image = Image.open(uploaded_file)
+    #st.image(image, caption='Uploaded Image', use_column_width=True)
+    text = pytesseract.image_to_string(image)
+    return textwrap.fill(text, 100)
+
 def search(search_text):
     try:
         if search_text:
             results = wikipedia.summary(search_text, sentences = 4)
-            doc = nlp(results) 
-            ner_types = {ent.label_ for ent in doc.ents}
-            pos_types = {word.pos_ for word in doc}
-            RadioButton(results, tuple(ner_types), tuple(pos_types))
+            doc = NLP(results) 
+            return doc
     except wikipedia.exceptions.DisambiguationError:
-        return None 
+        return None        
 
 def main():
-    st.title("Wikipedia Search App")
-    search(st.text_input("Enter text:"))
+    st.title("Innovative Annotation Application")
+    selected = option_menu(None, ["Entity Recognition", "Part Of Speech", "Image To Text"], 
+        icons=["house", "book", "camera"], menu_icon="cast", default_index=0, orientation="horizontal")
+    if selected == "Entity Recognition":
+        results = search(st.text_input("Enter text:"))
+        visualize_entities(results)
+    elif selected == "Part Of Speech":
+        results = search(st.text_input("Enter text:"))
+        pos_tagging(results)
+    elif selected == "Image To Text":
         
+        uploaded_file = st.file_uploader("", type=['jpg','png','jpeg'])
+        if uploaded_file is not None: 
+            results = extract_text_from_image(uploaded_file)
+            option = st.radio("Select Visualization", ("Entity Recognizer", "Part of Speech Tagging"),horizontal=True)
+            if option == "Entity Recognizer":
+                visualize_entities(results)
+            elif option == "Part of Speech Tagging":
+                pos_tagging(results)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def main():
+#     col1, col2 = st.columns( [0.8, 0.2])
+#     with col1:               # To display the header text using css style
+#         st.markdown(""" <style> .font {font-size:35px ; font-family: 'Cooper Black'; color: #FF9633;}</style> """, unsafe_allow_html=True)
+#         st.markdown('<p class="font">Upload your photo here...</p>', unsafe_allow_html=True)
+        
+#     with col2:               # To display brand logo
+#         st.write("logo,  width=150")
+#     #Add file uploader to allow users to upload photos
+    
+#     uploaded_file = st.file_uploader("", type=['jpg','png','jpeg'])    
+#     if uploaded_file is not None:
+#         image = Image.open(uploaded_file)
+        
+#     col1, col2 = st.columns( [0.5, 0.5])
+#     with col1:
+#         st.markdown('<p style="text-align: center;">Before</p>',unsafe_allow_html=True)
+#         st.image(image,width=300)  
+
+#     with col2:
+#         st.markdown('<p style="text-align: center;">After</p>',unsafe_allow_html=True)
+
+#         st.image(image,width=300)  
+        
 if __name__ == '__main__':
-    main()
+    main()        

@@ -58,4 +58,5 @@ To run the app locally, follow these steps:
 
 
 8. You can now interact with the app locally.
+.
 

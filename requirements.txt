@@ -1,0 +1,11 @@
+streamlit==1.32.2
+streamlit-option-menu==0.3.6
+audio_recorder_streamlit==0.0.8
+fastapi[all]
+openai==0.28
+python-dotenv==1.0.1
+wikipedia
+pytesseract
+textwrap3
+spacy
+pillow

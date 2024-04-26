@@ -1,6 +1,0 @@
-spacy
-streamlit
-streamlit-option-menu
-Pillow
-pytesseract
-wikipedia

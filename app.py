@@ -9,9 +9,9 @@ def main():
     
     
     with st.sidebar:
-        Options: list = ["Introduction" ,"Search", "Image to Text", "Speech to Text"]
+        Options: list = ["Introduction" ,"Search", "Image to Text"]
         selected: str = option_menu("Main Menu", Options, 
-            icons=['clipboard', 'search', 'image', 'mic'], menu_icon="cast", default_index=1)
+            icons=['clipboard', 'search', 'image'], menu_icon="cast", default_index=0)
         
     if selected == "Introduction":
         option.introduction()
@@ -19,8 +19,6 @@ def main():
         option.search()
     elif selected == "Image to Text":
         option.image_to_text()
-    elif selected == "Speech to Text":
-        option.speech_to_text()
 
 if __name__ == "__main__":
     main()

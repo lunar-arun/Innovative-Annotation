@@ -17,12 +17,3 @@ def visualize_entities(text):
         else:
             output = displacy.render([doc], style="ent", options={"ents": entity_types})
             st.write(output, unsafe_allow_html=True)
-
-        # i = 0
-        # for word in ner_words:
-        #     sideb = st.sidebar
-        #     i += 1
-        #     if sideb.button(word, key = i):
-        #         result = chat_with_gpt_entity(word)
-        #         st.sidebar.markdown(result)
-        # st.write(output, unsafe_allow_html=True)

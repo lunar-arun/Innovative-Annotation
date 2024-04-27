@@ -39,7 +39,3 @@ def image_to_text():
             option_menu(textwrap.fill(text, 100))
             #st.markdown(textwrap.fill(text, 100))
 
-
-def speech_to_text():
-    pass
-    

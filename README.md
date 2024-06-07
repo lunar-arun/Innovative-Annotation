@@ -41,7 +41,7 @@ To run the app locally, follow these steps:
 5. Install the necessary libraries by running the following command:
 
     ```
-    pip install -r requirement.txt
+    pip install -r requirements.txt
     ```
 
 6. Download the en_core_web_sm model using spaCy's command line interface:

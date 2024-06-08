@@ -9,3 +9,4 @@ pytesseract
 textwrap3
 spacy
 pillow
+IPython

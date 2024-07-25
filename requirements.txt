@@ -1,12 +1,10 @@
-streamlit==1.32.2
-streamlit-option-menu==0.3.6
-audio_recorder_streamlit==0.0.8
-fastapi[all]
-openai==0.28
-python-dotenv==1.0.1
+streamlit
+streamlit-option-menu
+audio_recorder_streamlit
 wikipedia
-pytesseract
 textwrap3
 spacy
+https://huggingface.co/spacy/en_core_web_sm/resolve/main/en_core_web_sm-any-py3-none-any.whl
 pillow
 IPython
+pytesseract

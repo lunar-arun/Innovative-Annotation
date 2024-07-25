@@ -56,6 +56,5 @@ def pos_tagging(text):
                     html += f"<span>{token.text} </span>"
             html += "</div>"
         st.write(HTML(html), unsafe_allow_html=True)    
-        #st.write(html, unsafe_allow_html=True)
        
               

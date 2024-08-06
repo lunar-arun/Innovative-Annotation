@@ -38,13 +38,7 @@ To run the app locally, follow these steps:
     pip install -r requirements.txt
     ```
 
-6. Download the en_core_web_sm model using spaCy's command line interface:
-
-    ```
-    python -m spacy download en_core_web_sm
-    ```
-
-7. Run the following command in the terminal to start the app:
+6. Run the following command in the terminal to start the app:
 
     ```
     streamlit run app.py
